@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>試合 進行・閲覧（Index）</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --fg:#111;
+      --muted:#666;
+      --line:#dcdcdc;
+      --head:#f3f5f7;
+      --btn:#111;
+      --btnfg:#fff;
+      --btn2:#f2f2f2;
+      --btn2fg:#111;
+      --radius:12px;
+    }
+
+    body{
+      margin:10px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+      background:var(--bg);
+      color:var(--fg);
+    }
+
+    h1{ font-size:16px; margin:0 0 6px; }
+    .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 10px;
+      line-height:1.35;
+    }
+
+    h2{
+      font-size:14px;
+      margin:12px 0 6px;
+    }
+
+    /* 横スクロール領域（枠は最小限） */
+    .scroll{
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+    }
+
+    table{
+      border-collapse:separate;
+      border-spacing:0;
+      width:100%;
+      min-width:500px; /* ← 760 → 640 に縮小 */
+      background:#fff;
+      table-layout: fixed;
+    }
+
+th:not(:first-child),
+td:not(:first-child){
+  width: 50px;   /* ← 好きな幅に調整 */
+}
+
+    th, td{
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      padding:6px 6px;          /* ← 10px → 6px */
+      vertical-align:middle;
+      text-align:center;
+      font-size:12px;           /* ← 13px → 12px */
+      white-space:nowrap;
+    }
+
+    th{
+      background:var(--head);
+      font-weight:700;
+    }
+
+    /* 1列目（区分列）を細く */
+    th:first-child, td:first-child{
+      width:20px;               /* ← 狭く */
+      min-width:20px;
+      max-width:20px;
+      padding:6px 4px;
+      font-weight:700;
+      position:sticky;
+      left:0;
+      z-index:2;
+      background:var(--head);
+      text-align:center;        /* ← タイトルずれ対策：中央 */
+    }
+    td:first-child{
+      background:#fff;
+      z-index:1;
+      font-weight:700;
+    }
+
+    /* ヘッダ固定 */
+    tr:first-child th{
+      position:sticky;
+      top:0;
+      z-index:3;
+    }
+
+    /* ボタンを小さく・詰める */
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 8px;          /* ← 小さく */
+      border-radius:10px;
+      text-decoration:none;
+      font-weight:700;
+      font-size:12px;
+      border:1px solid transparent;
+      line-height:1;
+      min-width:54px;           /* ← 86px → 54px */
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn.primary{ background:var(--btn); color:var(--btnfg); }
+    .btn.ghost{ background:var(--btn2); color:var(--btn2fg); border-color:var(--line); }
+    .btn:active{ transform: translateY(1px); }
+
+    .legend{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-size:11px;
+      color:var(--muted);
+      margin:8px 0 0;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+
+    .sep{
+      height:10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>試合 進行・閲覧（Index）</h1>
+  <p class="sub">
+    観客・閲覧用：各ボタンは <b>viewerモード</b>（閲覧専用）です。<br>
+    形（黒）／組手（白）を選んで開いてください。
+  </p>
+
+  <!-- 個人戦 -->
+  <h2>個人戦</h2>
+  <div class="scroll">
+    <table aria-label="個人戦一覧">
+      <tr>
+        <th rowspan="2">区分</th>
+        <th colspan="2">男子</th>
+        <th colspan="2">女子</th>
+      </tr>
+      <tr>
+        <th>形</th><th>組手</th>
+        <th>形</th><th>組手</th>
+      </tr>
+
+      <tr>
+        <td>小3</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e3_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e3_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e3_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e3_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>小4</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e4_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e4_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e4_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e4_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>小5</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e5_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e5_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e5_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e5_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>小6</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e6_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e6_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_e6_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_e6_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>中1</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_j1_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_j1_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_j1_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_j1_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>中2</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_j2_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_j2_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_j2_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_j2_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>中3</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_j3_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_j3_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_j3_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_j3_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>高校</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_hs_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_hs_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_hs_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_hs_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>一般</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_adult_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_adult_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=ind_adult_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=ind_adult_f">組手</a></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="legend">
+    <span class="pill"><b>形</b>：黒</span>
+    <span class="pill"><b>組手</b>：白</span>
+    <span class="pill">スマホは横スクロール</span>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- 団体戦 -->
+  <h2>団体戦</h2>
+  <div class="scroll">
+    <table aria-label="団体戦一覧">
+      <tr>
+        <th rowspan="2">区分</th>
+        <th colspan="2">男子</th>
+        <th colspan="2">女子</th>
+      </tr>
+      <tr>
+        <th>形</th><th>組手</th>
+        <th>形</th><th>組手</th>
+      </tr>
+
+      <tr>
+        <td>小3-4</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_e34_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_e34_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_e34_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_e34_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>小5-6</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_e56_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_e56_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_e56_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_e56_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>中学</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_jhs_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_jhs_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_jhs_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_jhs_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>高校</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_hs_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_hs_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_hs_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_hs_f">組手</a></td>
+      </tr>
+
+      <tr>
+        <td>一般</td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_adult_m">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_adult_m">組手</a></td>
+        <td><a class="btn primary" href="kata.html?mode=viewer&cat=team_adult_f">形</a></td>
+        <td><a class="btn ghost"   href="kumite.html?mode=viewer&cat=team_adult_f">組手</a></td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
