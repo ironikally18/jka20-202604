@@ -35,9 +35,12 @@ export default async function handler(req, res) {
     const json = (typeof body === 'string') ? body : JSON.stringify(body);
 
     await put(key, json, {
-      access: 'public',
-      contentType: 'application/json'
-    });
+  access: 'public',
+  contentType: 'application/json',
+  addRandomSuffix: false,
+  allowOverwrite: true,
+});
+
 
     res.status(200).json({ ok: true });
   }catch(e){
