@@ -333,6 +333,22 @@ body.viewer-mode #uploadJsonBtn,
 body.viewer-mode #clearBtn,
 body.viewer-mode #resetBtn{ display:none !important; }
 
+/* viewer用：一覧へ戻るボタン */
+.backIndex{
+  position: fixed;
+  top: 6px;
+  right: 6px;
+  z-index: 9999;
+
+  font-size: 12px;
+  padding: 4px 8px;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border-radius: 999px;
+  text-decoration: none;
+  line-height: 1;
+}
+
 </style>
 </head>
 
@@ -341,6 +357,8 @@ body.viewer-mode #resetBtn{ display:none !important; }
   <div class="titleBox">
     <input id="metaTitle" type="text" value="第00回 神奈川県空手道選手権大会" />
   </div>
+    <!-- viewer用：indexに戻る -->
+    <a href="./index.html" class="backIndex">一覧へ</a>
   <div id="viewerHeader" class="viewerHeader" style="display:none;">
     <div id="viewerTitle" class="viewerTitle"></div>
     <div class="viewerMeta">
@@ -373,9 +391,11 @@ body.viewer-mode #resetBtn{ display:none !important; }
         <input id="metaCategory" type="text" value="一般男子の部">
       </div>
 
+      <!--
       <div class="row" id="catRow">
         <select id="catSelect"></select>
       </div>
+      -->
 
       <div class="row" id="syncRow">
         <input id="whoInput" type="text" placeholder="更新者(任意)" style="width:120px;" />
