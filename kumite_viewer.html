@@ -392,7 +392,7 @@ body.viewer-mode .winner {
   // コート（URL ?court=1 など。無ければ 1）
   const court = (params.get("court") || "1").trim();
   const courtEl = document.getElementById("viewerCourt");
-  if (courtEl) courtEl.textContent = `コート：[${court}]`;
+  if (courtEl) courtEl.textContent = `閲覧専用　コート[ ${court} ]`;
 
   // カテゴリー（URL ?cat=...）
   const cat = (params.get("cat") || "").trim();
@@ -433,7 +433,7 @@ body.viewer-mode .winner {
   const group = cat.startsWith("team_") ? "団体戦" : (cat.startsWith("ind_") ? "個人戦" : "カテゴリー");
   const label = CAT_LABELS[cat] || (cat ? cat : "未指定");
   const catEl = document.getElementById("viewerCategory");
-  if (catEl) catEl.textContent = `カテゴリー：${group} / 組手 ${label}`;
+  if (catEl) catEl.textContent = `${group} 組手 ${label}`;
 })();
 
 
