@@ -282,6 +282,20 @@ body.viewer-mode #courtPalette button{
   cursor: default !important;
 }
 
+/* ===== viewer専用：コート操作（色付け/割当）を完全無効化 ===== */
+body.viewer-mode #courtPalette,
+body.viewer-mode .court-input,
+body.viewer-mode #courtCountInput,
+body.viewer-mode #setCourtCountBtn{
+  pointer-events: none !important;
+}
+body.viewer-mode .court-input,
+body.viewer-mode #courtCountInput,
+body.viewer-mode #setCourtCountBtn{
+  opacity: 0.75;
+}
+
+
 </style>
 </head>
 
@@ -723,38 +737,47 @@ function renderBase(){
     const col = document.createElement("div");
     col.className = "column";
 
-    round.forEach((_, m) => {
-      const w = document.createElement("div");
-      w.className = "match-wrapper";
-      w.id = `r${r}m${m}`;
-      w.style.top = (calcY(r, m) + TOP_PAD) + "px";
+round.forEach((_, m) => {
+  const w = document.createElement("div");
+  w.className = "match-wrapper";
+  w.id = `r${r}m${m}`;
+  w.style.top = (calcY(r, m) + TOP_PAD) + "px";
 
-      const box = document.createElement("div");
-      box.className = "match";
-      w.appendChild(box);
+  const box = document.createElement("div");
+  box.className = "match";
+  w.appendChild(box);
 
-      let pressTimer = null;
-      const assignCourt = () => {
-        if (selectedCourt && selectedCourt !== "-") {
-          const match = state.rounds[r][m];
-          match.court = selectedCourt;
-          render();
-        }
-      };
-      w.addEventListener("mousedown", (e)=>{
-        if(e.target && e.target.tagName === "BUTTON") return;
-        pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
-      });
-      w.addEventListener("mouseup", ()=>clearTimeout(pressTimer));
-      w.addEventListener("mouseleave", ()=>clearTimeout(pressTimer));
-      w.addEventListener("touchstart", (e)=>{
-        if(e.target && e.target.tagName === "BUTTON") return;
-        pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
-      }, {passive:true});
-      w.addEventListener("touchend", ()=>clearTimeout(pressTimer));
+  let pressTimer = null;
+  const assignCourt = () => {
+    if (selectedCourt && selectedCourt !== "-") {
+      const match = state.rounds[r][m];
+      match.court = selectedCourt;
+      render();
+    }
+  };
 
-      col.appendChild(w);
+  // viewerではコート割当（長押し）を無効化：イベントを付けない
+  if (!document.body.classList.contains("viewer-mode")) {
+    w.addEventListener("mousedown", (e) => {
+      if (e.target && e.target.tagName === "BUTTON") return;
+      pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
     });
+    w.addEventListener("mouseup", () => clearTimeout(pressTimer));
+    w.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+    w.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.target && e.target.tagName === "BUTTON") return;
+        pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
+      },
+      { passive: true }
+    );
+    w.addEventListener("touchend", () => clearTimeout(pressTimer));
+  }
+
+  col.appendChild(w);
+});
+
 
     t.appendChild(col);
   });
