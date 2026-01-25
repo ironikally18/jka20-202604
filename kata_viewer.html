@@ -363,6 +363,18 @@ body.viewer-mode .winner {
   line-height: 1;
 }
 
+/* ===== viewer専用：操作できないようにロック ===== */
+body.viewer-mode .side-btn,
+body.viewer-mode #tournament button,
+body.viewer-mode #courtPalette button,
+body.viewer-mode .match-wrapper,
+body.viewer-mode .matchBox{
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+
+
 </style>
 </head>
 
@@ -751,6 +763,16 @@ function calcY(r, m){
 
 /* 出欠列 */
 function createSideButton(player, parent){
+  // viewerでは出欠操作（長押し含む）を完全に無効化
+  if(document.body.classList.contains("viewer-mode")){
+    const btn = document.createElement("button");
+    btn.className = "side-btn";
+    btn.textContent = (player && player.attendance) ? player.attendance : "-";
+    btn.disabled = true;
+    parent.appendChild(btn);
+    return;
+  }
+
   const btn = document.createElement("button");
   btn.className = "side-btn";
   const states = ["-","済","未","欠","棄"];

@@ -273,6 +273,15 @@ body.viewer-mode .winner {
   line-height: 1;
 }
 
+/* ===== viewer専用：操作できないようにロック ===== */
+body.viewer-mode .playerBtn,
+body.viewer-mode .side-btn,
+body.viewer-mode #wrapper button,
+body.viewer-mode #courtPalette button{
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
 </style>
 </head>
 
@@ -616,6 +625,13 @@ function createSideButton(player, parent){
   b.textContent = player.attendance;
   styleSideBtn(b, player.attendance);
 
+    // viewerでは出欠操作（長押し含む）を完全に無効化
+  if(document.body.classList.contains("viewer-mode")){
+    b.disabled = true;
+    parent.appendChild(b);
+    return;
+  }
+
   // 短押し(クリック)は無効：誤操作防止
   b.addEventListener("click", (e) => {
     e.preventDefault();
@@ -941,6 +957,13 @@ function render(){
         if(match.winner){
           if(p === match.winner) b.classList.add("winner");
           else b.classList.add("loser");
+        }
+
+                // viewerではトーナメント操作を完全に無効化
+        if(document.body.classList.contains("viewer-mode")){
+          b.disabled = true;
+          box.appendChild(b);
+          return;
         }
 
         b.addEventListener("click", () => {
