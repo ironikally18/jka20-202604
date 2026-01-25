@@ -1172,21 +1172,32 @@ window.addEventListener("resize", ()=>{
 
 /* ===== 開始 ===== */
 function startTournament(){
-  state.metaTitle = document.getElementById("metaTitle").value.trim();
-  state.metaType = document.getElementById("metaType").value.trim();
-  state.metaStyle = document.getElementById("metaStyle").value.trim();
-  state.metaCategory = document.getElementById("metaCategory").value.trim();
+  const val = (id) => {
+    const el = document.getElementById(id);
+    return (el && typeof el.value === "string") ? el.value.trim() : "";
+  };
+
+  state.metaTitle    = val("metaTitle");
+  state.metaType     = val("metaType");
+  state.metaStyle    = val("metaStyle");
+  state.metaCategory = val("metaCategory"); // 無くても落ちない
   document.title = state.metaTitle || "形試合（ベスト8→決勝採点）";
 
-  const raw = document.getElementById("players").value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
+  const playersEl = document.getElementById("players");
+  const raw = (playersEl ? playersEl.value : "")
+    .split(/\r?\n/)
+    .map(v => v.trim())
+    .filter(Boolean);
+
   if(raw.length < 1){ alert("1名以上入力してください"); return; }
 
-  state.players = raw.map(name=>({ name, attendance:"-" }));
+  state.players = raw.map(name => ({ name, attendance:"-" }));
   buildRoundsToBest8();
   renderBase();
   render();
   closeFinal();
 }
+
 document.getElementById("startBtn").addEventListener("click", startTournament);
 
 /* ===== 決勝（手動ボタン） ===== */

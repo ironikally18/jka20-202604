@@ -1401,7 +1401,8 @@ document.getElementById("finalSaveBtn").addEventListener("click", finalSave);
 })();
 
 function startTournament(){
-  const raw = document.getElementById("players").value
+  const playersEl = document.getElementById("players");
+  const raw = (playersEl ? playersEl.value : "")
     .split(/\r?\n/)
     .map(v => v.trim())
     .filter(Boolean);
