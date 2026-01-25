@@ -273,6 +273,13 @@ body.viewer-mode .winner {
   line-height: 1;
 }
 
+/* ===== 編集者UI整理（運用向け） ===== */
+#whoInput{display:none !important;}
+#loadBtn{display:none !important;}
+#metaCategoryRow{display:none !important;}
+/* editorでもサーバー通信結果を表示 */
+#syncStatus{display:block;}
+
 </style>
 </head>
 
@@ -313,7 +320,7 @@ body.viewer-mode .winner {
         <input id="metaType" type="text" value="組手">
       </div>
 
-      <div class="row">
+      <div class="row" id="metaCategoryRow">
         <input id="metaCategory" type="text" value="一般男子の部">
       </div>
 
@@ -327,6 +334,7 @@ body.viewer-mode .winner {
         <input id="whoInput" type="text" placeholder="更新者(任意)" style="width:120px;" />
         <button id="srvLoadBtn" type="button">サーバー読込</button>
         <button id="srvSaveBtn" type="button">サーバー保存</button>
+        <div id="syncStatus" style="font-size:12px;opacity:.85;min-width:140px;"></div>
       </div>
 
       <div class="row" id="viewerRow" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -457,7 +465,7 @@ let state = {
   thirdMatch: { players: [], winner: null, court: null }
 };
 
-const LONG_PRESS_TIME = 600;
+const LONG_PRESS_TIME = 1800;
 let pendingWin = null;
 
 const TEMP_KEY = "karate_tournament_temp_v1";
@@ -708,39 +716,71 @@ function renderBase(){
     col.className = "column";
 
     round.forEach((_, m) => {
-      const w = document.createElement("div");
-      w.className = "match-wrapper";
-      w.id = `r${r}m${m}`;
-      w.style.top = (calcY(r, m) + TOP_PAD) + "px";
+  const w = document.createElement("div");
+  w.className = "match-wrapper";
+  w.id = `r${r}m${m}`;
+  w.style.top = (calcY(r, m) + TOP_PAD) + "px";
 
-      const box = document.createElement("div");
-      box.className = "match";
-      w.appendChild(box);
+  const box = document.createElement("div");
+  box.className = "match";
+  w.appendChild(box);
 
-      let pressTimer = null;
-      const assignCourt = () => {
-        if (selectedCourt && selectedCourt !== "-") {
-          const match = state.rounds[r][m];
-          match.court = selectedCourt;
-          render();
-        }
-      };
-      w.addEventListener("mousedown", (e)=>{
-        if(e.target && e.target.tagName === "BUTTON") return;
-        pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
-      });
-      w.addEventListener("mouseup", ()=>clearTimeout(pressTimer));
-      w.addEventListener("mouseleave", ()=>clearTimeout(pressTimer));
-      w.addEventListener("touchstart", (e)=>{
-        if(e.target && e.target.tagName === "BUTTON") return;
-        pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
-      }, {passive:true});
-      w.addEventListener("touchend", ()=>clearTimeout(pressTimer));
+  let pressTimer = null;
 
-      col.appendChild(w);
-    });
+  const clearPress = () => {
+    if (pressTimer) clearTimeout(pressTimer);
+    pressTimer = null;
+  };
 
-    t.appendChild(col);
+  const assignCourt = () => {
+    pressTimer = null; // 発火したら必ずクリア
+    if (selectedCourt && selectedCourt !== "-") {
+      const match = state.rounds[r][m];
+      match.court = selectedCourt;
+      render();
+    }
+  };
+
+  const shouldIgnoreLongPress = (e) => {
+    const t = e.target;
+    // ボタン・入力など「別操作」から始まった場合はコート割当を開始しない
+    if (t && t.closest) {
+      if (t.closest("button, input, select, textarea, a, label")) return true;
+      // 勝者取消が data-action を使っているなら弾く（保険）
+      if (t.closest("[data-action='cancelWinner'], [data-action='winnerCancel']")) return true;
+      // 勝者取消が専用クラスの場合はここで弾ける（使っていれば）
+      if (t.closest(".winnerCancelArea")) return true;
+    }
+    if (t && t.tagName === "BUTTON") return true;
+    return false;
+  };
+
+  w.addEventListener("mousedown", (e) => {
+    if (shouldIgnoreLongPress(e)) return;
+    clearPress();
+    pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
+  });
+
+  w.addEventListener("mouseup", clearPress);
+  w.addEventListener("mouseleave", clearPress);
+
+  w.addEventListener(
+    "touchstart",
+    (e) => {
+      if (shouldIgnoreLongPress(e)) return;
+      clearPress();
+      pressTimer = setTimeout(assignCourt, LONG_PRESS_TIME);
+    },
+    { passive: true }
+  );
+
+  w.addEventListener("touchend", clearPress);
+
+  col.appendChild(w);
+});
+
+t.appendChild(col);
+
   });
 
   const finalR = state.rounds.length - 1;
@@ -1446,8 +1486,10 @@ function getCurrentCat(){
 }
 
 function setLastSyncText(msg){
-  const el=document.getElementById("lastSync");
-  if(el) el.textContent = msg || "";
+  const v=document.getElementById("lastSync");
+  if(v) v.textContent = msg || "";
+  const e=document.getElementById("syncStatus");
+  if(e) e.textContent = msg || "";
 }
 
 function nowHHMMSS(){
@@ -1457,6 +1499,18 @@ function nowHHMMSS(){
   const ss=String(d.getSeconds()).padStart(2,"0");
   return `${hh}:${mm}:${ss}`;
 }
+
+function flashSyncStatus(ok){
+  const e=document.getElementById("syncStatus");
+  if(!e) return;
+  const prev=e.style.background;
+  const prevP=e.style.padding;
+  e.style.padding="2px 6px";
+  e.style.borderRadius="8px";
+  e.style.background = ok ? "rgba(34,197,94,.18)" : "rgba(239,68,68,.18)";
+  setTimeout(()=>{ e.style.background = prev || ""; e.style.padding = prevP || ""; }, 900);
+}
+
 
 async function serverLoad(){
   const cat=getCurrentCat();
@@ -1471,13 +1525,16 @@ async function serverLoad(){
     }
     if(!res.ok){
       setLastSyncText(`読込失敗（${res.status}）`);
+      flashSyncStatus(false);
       return;
     }
     const data = await res.json();
     restoreApp(data);
     setLastSyncText(`読込 OK（${nowHHMMSS()}）`);
+    flashSyncStatus(true);
   }catch(e){
     setLastSyncText(`読込失敗（${nowHHMMSS()}）`);
+    flashSyncStatus(false);
   }
 }
 
@@ -1515,12 +1572,15 @@ async function serverSave(){
     });
     if(!res.ok){
       setLastSyncText(`保存失敗（${res.status}）`);
+      flashSyncStatus(false);
       alert("サーバー保存に失敗しました（保存キーやVercel設定を確認）");
       return;
     }
     setLastSyncText(`保存 OK（${nowHHMMSS()}）`);
+    flashSyncStatus(true);
   }catch(e){
     setLastSyncText(`保存失敗（${nowHHMMSS()}）`);
+    flashSyncStatus(false);
     alert("サーバー保存に失敗しました");
   }
 }
