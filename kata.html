@@ -796,76 +796,76 @@ function renderBase(){
   sideCol.className = "side-column";
   t.appendChild(sideCol);
 
+  state.rounds.forEach((round, r) => {
+  const col = document.createElement("div");
+  col.className = "column";
+
   round.forEach((match, m) => {
-  const w = document.createElement("div");
-  w.className = "match-wrapper";
-  w.id = `r${r}m${m}`;
-  w.style.top = (calcY(r, m) + getCssNum("--top-pad", 14)) + "px";
+    const w = document.createElement("div");
+    w.className = "match-wrapper";
+    w.id = `r${r}m${m}`;
+    w.style.top = (calcY(r, m) + getCssNum("--top-pad", 14)) + "px";
 
-  const box = document.createElement("div");
-  box.className = "match matchBox";
-  box.dataset.court = (match.court || "-");
-  w.appendChild(box);
+    const box = document.createElement("div");
+    box.className = "match matchBox";
+    box.dataset.court = (match.court || "-");
+    w.appendChild(box);
 
-  let pressTimer = null;
+    let pressTimer = null;
 
-  const clearPress = () => {
-    if (pressTimer) clearTimeout(pressTimer);
-    pressTimer = null;
-  };
+    const clearPress = () => {
+      if (pressTimer) clearTimeout(pressTimer);
+      pressTimer = null;
+    };
 
-  const armCourt = () => {
-    pressTimer = null; // 発火したら必ずクリア
-    if (selectedCourt != null && selectedCourt !== "-") {
-      match.court = selectedCourt;
-      box.dataset.court = selectedCourt;
-      render();
-      requestAnimationFrame(syncSidePositions);
+    const armCourt = () => {
+      pressTimer = null;
+      if (selectedCourt != null && selectedCourt !== "-") {
+        match.court = selectedCourt;
+        box.dataset.court = selectedCourt;
+        render();
+        requestAnimationFrame(syncSidePositions);
+      }
+    };
+
+    const shouldIgnoreLongPress = (e) => {
+      const t = e.target;
+      if (t && t.closest) {
+        if (t.closest("button, input, select, textarea, a, label")) return true;
+        if (t.closest("[data-action='cancelWinner'], [data-action='winnerCancel']")) return true;
+        if (t.closest(".winnerCancelArea")) return true;
+      }
+      if (t && t.tagName === "BUTTON") return true;
+      return false;
+    };
+
+    // viewerではコート割当（長押し）を無効化：イベントを付けない
+    if (!document.body.classList.contains("viewer-mode")) {
+      w.addEventListener("mousedown", (e) => {
+        if (shouldIgnoreLongPress(e)) return;
+        clearPress();
+        pressTimer = setTimeout(armCourt, LONG_PRESS_TIME);
+      });
+      w.addEventListener("mouseup", clearPress);
+      w.addEventListener("mouseleave", clearPress);
+      w.addEventListener("touchstart", (e) => {
+        if (shouldIgnoreLongPress(e)) return;
+        clearPress();
+        pressTimer = setTimeout(armCourt, LONG_PRESS_TIME);
+      }, { passive: true });
+      w.addEventListener("touchend", clearPress);
     }
-  };
 
-  const shouldIgnoreLongPress = (e) => {
-    const t = e.target;
-    // ボタン類・入力類・リンクから始まった操作は「コート割当」を開始しない
-    if (t && t.closest) {
-      if (t.closest("button, input, select, textarea, a, label")) return true;
-      // 勝者取消がボタン以外の場合の保険：data-action を使っているならここで弾けます
-      if (t.closest("[data-action='cancelWinner'], [data-action='winnerCancel']")) return true;
-    }
-    // tagName だけの旧チェックも残す
-    if (t && t.tagName === "BUTTON") return true;
-    return false;
-  };
-
-  w.addEventListener("mousedown", (e) => {
-    if (shouldIgnoreLongPress(e)) return;
-    clearPress();
-    pressTimer = setTimeout(armCourt, LONG_PRESS_TIME);
+    col.appendChild(w);
+    maxY = Math.max(
+      maxY,
+      (calcY(r, m) + getCssNum("--top-pad", 14) + getCssNum("--box-h", 104))
+    );
   });
 
-  w.addEventListener("mouseup", clearPress);
-  w.addEventListener("mouseleave", clearPress);
-
-  w.addEventListener(
-    "touchstart",
-    (e) => {
-      if (shouldIgnoreLongPress(e)) return;
-      clearPress();
-      pressTimer = setTimeout(armCourt, LONG_PRESS_TIME);
-    },
-    { passive: true }
-  );
-
-  w.addEventListener("touchend", clearPress);
-
-  col.appendChild(w);
-  maxY = Math.max(
-    maxY,
-    (calcY(r, m) + getCssNum("--top-pad", 14) + getCssNum("--box-h", 104))
-  );
+  t.appendChild(col);
 });
 
-t.appendChild(col);
 
 
   const h = Math.max(320, maxY + 40);
