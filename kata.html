@@ -383,7 +383,7 @@ body.viewer-mode .winner {
     <input id="metaTitle" type="text" value="第00回 神奈川県空手道選手権大会" />
   </div>
     <!-- viewer用：indexに戻る -->
-    <a href="./index.html" class="backIndex">一覧へ</a>
+    <a href="./index_edit.html" class="backIndex">一覧へ</a>
   <div id="viewerHeader" class="viewerHeader" style="display:none;">
     <div id="viewerTitle" class="viewerTitle"></div>
     <div class="viewerMeta">
@@ -621,7 +621,7 @@ let selectedCourt = null;
 
 let state = { players:[], rounds:[], best8:[], metaTitle:"", metaType:"", metaStyle:"", metaCategory:"", finalState:null };
 
-const LONG_PRESS_TIME = 1800;
+const LONG_PRESS_TIME = 600;
 let pendingWin = null;
 
 let finalPlayers = [];
@@ -990,7 +990,7 @@ function undo(r, m){
   render();
 }
 
-/* 自動勝者：seed / '-' のみ（欠/棄は自動勝者にしない） */
+/* 自動勝者：seed / '-' のみ（欠/棄は自動勝者にしない） 
 function autoJudgeMatch(r, m){
   if(!state.rounds[r] || !state.rounds[r][m]) return;
   const match = state.rounds[r][m];
@@ -1006,6 +1006,13 @@ function autoJudgeMatch(r, m){
   if(p1Seed && !p2Seed && p2){ win(r,m,p2); return; }
   if(p2Seed && !p1Seed && p1){ win(r,m,p1); return; }
 }
+*/
+
+/* 自動勝ち上がりは行わない（seed / '-' も含めて手動確定のみ） */
+function autoJudgeMatch(r, m){
+  return;
+}
+
 
 function render(){
   state.rounds.forEach((round, r)=>{

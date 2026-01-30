@@ -294,7 +294,7 @@ body.viewer-mode .winner {
   </div>
 
   <!-- viewer用：indexに戻る -->
-  <a href="./index.html" class="backIndex">一覧へ</a>
+  <a href="./index_edit.html" class="backIndex">一覧へ</a>
 
   <div id="viewerHeader" class="viewerHeader" style="display:none;">
     <div id="viewerTitle" class="viewerTitle"></div>
@@ -469,7 +469,7 @@ let state = {
   thirdMatch: { players: [], winner: null, court: null }
 };
 
-const LONG_PRESS_TIME = 1800;
+const LONG_PRESS_TIME = 600;
 let pendingWin = null;
 
 const TEMP_KEY = "karate_tournament_temp_v1";
@@ -922,6 +922,7 @@ function selectThird(p, btn){
   btn.classList.add("selected");
 }
 
+/*
 function autoJudgeMatch(r,m){
   const match = state.rounds[r][m];
   if(!match || match.winner) return;
@@ -933,6 +934,12 @@ function autoJudgeMatch(r,m){
 
   if(p1Seed && !p2Seed && p2) { win(r,m,p2); return; }
   if(p2Seed && !p1Seed && p1) { win(r,m,p1); return; }
+}
+*/
+
+/* 自動勝ち上がりは行わない（seed も手動確定のみ） */
+function autoJudgeMatch(r, m){
+  return;
 }
 
 function render(){
