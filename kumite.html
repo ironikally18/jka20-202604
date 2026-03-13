@@ -474,6 +474,12 @@ let pendingWin = null;
 
 const TEMP_KEY = "karate_tournament_temp_v1";
 
+function getTempKey(){
+  const cat = qsParam("cat") || "default";
+  const key = qsParam("key") || "default";
+  return `TEMP_KUMITE_${cat}_${key}`;
+}
+
 function getCssNum(name, fallback){
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   if(!v) return fallback;
@@ -1376,7 +1382,7 @@ function downloadJson(data){
 
 function tempSave(){
   const data = serializeApp();
-  try{ localStorage.setItem(TEMP_KEY, JSON.stringify(data)); }catch(_){ }
+  try{ localStorage.setItem(getTempKey(), JSON.stringify(data)); }catch(_){ }
   downloadJson(data);
 }
 
@@ -1442,7 +1448,7 @@ buildCourtPalette();
 /* 起動時：一時保存があれば自動復元 */
 (() => {
   try{
-    const s = localStorage.getItem(TEMP_KEY);
+    const s = localStorage.getItem(getTempKey());
     if(!s) return;
     const data = JSON.parse(s);
     restoreApp(data);
