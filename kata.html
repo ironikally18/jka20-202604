@@ -1182,6 +1182,12 @@ window.addEventListener("resize", ()=>{
   requestAnimationFrame(syncSidePositions);
 });
 
+function getTempKey(){
+  const cat = qsParam("cat") || "default";
+  const key = qsParam("key") || "default";
+  return `TEMP_${cat}_${key}`;
+}
+
 /* ===== 開始 ===== */
 function startTournament(){
   const val = (id) => {
@@ -1309,7 +1315,7 @@ function restoreFromPayload(data){
 
 function tempSave(){
   const payload = getPayload();
-  try{ localStorage.setItem(TEMP_KEY, JSON.stringify(payload)); }catch(_){ }
+  try{ localStorage.setItem(getTempKey(), JSON.stringify(payload)); }catch(_){ }
   downloadJson(payload);
 }
 
@@ -1361,7 +1367,7 @@ document.getElementById("finalSaveBtn").addEventListener("click", finalSave);
 // 起動時：この端末の一時保存があれば復元（任意）
 (() => {
   try{
-    const s = localStorage.getItem(TEMP_KEY);
+    const s = localStorage.getItem(getTempKey());
     if(!s) return;
     const data = JSON.parse(s);
     restoreFromPayload(data);
